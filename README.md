@@ -62,3 +62,57 @@ SpringBootTest 기능과 JUnit 기능을 연결하는 다리 역할을 하는 �
 > The *@SpringBootTest* annotation can be used when we need to bootstrap the entire container. The annotation works by creating the *ApplicationContext* that will be utilized in our tests.
 >
 > [baeldung](https://www.baeldung.com/spring-boot-testing)
+
+
+
+```java
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient
+public class ArticleControllerTests {
+    ...
+}
+```
+
+
+
+#### webEnvironment
+
+`@SpringBootTest`는 기본적으로 웹서버를 실행시키지 않는다. `webEnvironment`설정을 통해 애플리케이션이 실행될 때 웹 환경을 설정할 수 있다. 
+
+* MOCK : 웹 ApplicationContext를 로드하고 모의 웹 환경을 제공. 내장 서버가 시작되지 않는다. 클래스 경로에서 웹 환경을 사용할 수없는 경우이 모드는 웹 이외의 일반 ApplicationContext를 작성하는 것으로 대체된다. 웹 응용 프로그램의 모의 기반 테스트를 위해 `@AutoConfigureMockMvc` 또는 `@AutoConfigureWebTestClient`와 함께 사용할 수 있다.
+* RANDOM_PORT : WebServerApplicationContext를 로드하고 실제 웹 환경을 제공. 내장 서버가 시작되고 임의 포트가 실행.
+* DEFINED_PORT : WebServerApplicationContext를 로드하고 실제 웹 환경을 제공. 임베디드 서버가 시작되어 정의 된 포트 (application.properties에서) 또는 기본 포트 8080로 실행.
+* NONE : SpringApplication을 사용하여 ApplicationContext를로드하지만 웹 환경 (모의 또는 기타)을 제공하지 않음.
+
+> By default, `@SpringBootTest` will not start a server. You can use the `webEnvironment` attribute of `@SpringBootTest` to further refine how your tests run:
+>
+> - `MOCK`(Default) : Loads a web `ApplicationContext` and provides a mock web environment. Embedded servers are not started when using this annotation. If a web environment is not available on your classpath, this mode transparently falls back to creating a regular non-web `ApplicationContext`. It can be used in conjunction with [`@AutoConfigureMockMvc` or `@AutoConfigureWebTestClient`](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-testing-spring-boot-applications-testing-with-mock-environment) for mock-based testing of your web application.
+> - `RANDOM_PORT`: Loads a `WebServerApplicationContext` and provides a real web environment. Embedded servers are started and listen on a random port.
+> - `DEFINED_PORT`: Loads a `WebServerApplicationContext` and provides a real web environment. Embedded servers are started and listen on a defined port (from your `application.properties`) or on the default port of `8080`.
+> - `NONE`: Loads an `ApplicationContext` by using `SpringApplication` but does not provide *any* web environment (mock or otherwise).
+>
+> [spring boot docs](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-testing-spring-boot-applications)
+
+
+
+### @AutoConfigureWebTestClient
+
+테스트하려는 웹 엔드포인트가 있는 경우, `webTestClent`를 사용하고 싶으면 `@AutoConfigureWebTestClient` 어노테이션을 사용하면 된다.
+
+```java
+@SpringBootTest
+@AutoConfigureWebTestClient
+class MockWebTestClientExampleTests {
+
+    @Test
+    void exampleTest(@Autowired WebTestClient webClient) {
+        webClient.get().uri("/").exchange().expectStatus().isOk().expectBody(String.class).isEqualTo("Hello World");
+    }
+
+}
+```
+
+> [spring boot docs](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-testing-spring-boot-applications-testing-with-mock-environment)
+
+비동기라는 점을 인지하고 테스트를 작성해야한다.

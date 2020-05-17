@@ -49,6 +49,8 @@ SpringBootTest 기능과 JUnit 기능을 연결하는 다리 역할을 하는 �
 
 
 
+
+
 ### @SpringBootTest - 똑같이 애플리케이션 컨텍스트 로드
 
 `@SpringBootTest` 는 통합 테스트를 제공하는 기본적인 스프링부트 어노테이션.
